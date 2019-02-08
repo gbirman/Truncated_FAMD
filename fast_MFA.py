@@ -6,14 +6,15 @@ Created on Thu Jan 31 18:43:24 2019
 """
 
 
-from fast_MCA import MCA
-from fast_PCA import PCA
+from .fast_MCA import MCA
+from .fast_PCA import PCA
 
 import six
 import numpy as np
 import pandas as pd 
 from sklearn.utils import check_array
 
+from  .outils import _pearsonr
 class MFA(PCA):
     def __init__(self,standard_scaler=True,n_components=2,svd_solver='auto',whiten=False,copy=True,
                  tol=None,iterated_power=2,batch_size =None,random_state=None,groups=None):
@@ -86,9 +87,23 @@ class MFA(PCA):
         X_global=self._X_global(X)
         return len(X_global) ** 0.5 *super().transform(X_global)
     
-    def column_correlation(self,X,same_input=True):
+    def fit_transform(self,X,y=None):
         X_global=self._X_global(X)
-        return super().column_correlation(X_global,same_input=locals()['same_input'])
+        return len(X_global) ** 0.5 *super().fit_transform(X_global)        
+        
+    
+    def column_correlation(self,X,same_input=True):
+        X_global=  self._X_global(X)
+        if   same_input: #X is fitted and the the data fitting and the data transforming is the same
+            X_t=len(X_global) ** 0.5 *super().transform(X_global)
+        else:
+            X_t=len(X_global) ** 0.5 *super().fit_transform(X_global)
+        
+        return pd.DataFrame({index_comp:{ 
+                            col_name: _pearsonr(X_t[:,index_comp],X_global.loc[:,col_name].values.to_dense())
+                              for col_name in  X_global
+                                    }
+                                    for index_comp  in range(X_t.shape[1])})
         
         
 '''

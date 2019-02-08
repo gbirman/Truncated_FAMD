@@ -5,7 +5,7 @@ Created on Wed Jan 30 14:43:42 2019
 @author: luyao
 """
 
-from base import  _BasePCA
+from .base import  _BasePCA
 
 
 from math import log
@@ -19,14 +19,13 @@ from sklearn.utils import check_array,check_random_state
 from sklearn.utils.extmath import _incremental_mean_and_var,svd_flip,stable_cumsum,randomized_svd
 from sklearn.utils.sparsefuncs_fast import  incr_mean_variance_axis0
 from  sklearn.utils import gen_batches
-from sklearn.utils.validation import check_is_fitted
 
 import numpy as np
 import pandas as pd
 import numbers
 import six
 
-from outils import _pearsonr
+from .outils import _pearsonr
 
 from sklearn.preprocessing import  StandardScaler
 from sklearn.exceptions import DataConversionWarning
@@ -398,8 +397,8 @@ class  PCA(_BasePCA):
     def fit_transform(self, X,y=None):
         n_samples,n_features= X.shape
         U,S,VT=self._fit(X)
-        
-        U=U[:self.n_components]
+
+        U=U[:,:self.n_components]
         if self.whiten:
             U*=np.sqrt(n_samples -1)
         else:
@@ -417,10 +416,11 @@ class  PCA(_BasePCA):
         else:
             col_names=np.arange(X.shape[1])
         
-        if check_is_fitted(self,'components_') and  same_input: #X is fitted and the the data fitting and the data transforming is the same
-                X_t=self.transform(X)
+        if   same_input: #X is fitted and the the data fitting and the data transforming is the same
+            X_t=self.transform(X)
         else:
             X_t=self.fit_transform(X)
+
         return  pd.DataFrame({index_comp:{ 
                                         col_name: _pearsonr(X_t[:,index_comp],X[:,index_col])
                                           for index_col,col_name in enumerate(col_names)  
@@ -458,23 +458,19 @@ if  __name__== '__main__':
   mean_correction=sqrt(n_samples*self.n_sample_seen /n_sample_total)*(_local_mean - self.mean_)
   ValueError: math domain error:
       np.sqrt
+      
+      6)
+  File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 426, in <dictcomp>
+    for index_col,col_name in enumerate(col_names)
+    ValueError: operands could not be broadcast together with shapes (2,) (10000,) 
+    if  same_input:
+        X_t=self.transform(X)
+    
+    
     '''
-    from MyOutils import Timer
-    for i in [10000,50000,100000]:
-        print('{0} samples'.format(i))
-        timer=Timer()
+
         
-        X = np.random.randint(0,1000,size=(i,5000))
-        timer.start('mypca')
-        pca = PCA(n_components=2,standard_scaler=False)
-        pca.fit(X)
-        timer.stopprint('mypca')
-        
-        from sklearn.decomposition import PCA as  _PCA
-        timer.start('pca')
-        pca = _PCA(n_components=2)
-        pca.fit(X)
-        timer.stopprint('pca')
+
                 
         
             

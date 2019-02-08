@@ -5,7 +5,7 @@ Created on Sun Feb  3 10:39:04 2019
 @author: luyao.li
 """
 
-from .fast_MFA  import MFA
+from fast_MFA  import MFA
 import pandas as pd
 import numpy as np
 
@@ -93,10 +93,12 @@ Timer correlation:19.3034 s
 Timer transform:12.6420 s
 
 (100000, 600) memory usage:   782.0 MB
-Timer famd:111.9764 s
-Timer correlation:23.8569 s
+Timer famd:115.2261 s
+Timer correlation:21.5445 s
+Timer transform:14.6897 s
 
-Timer transform:16.5418 s
+
+
 
 
 
@@ -109,6 +111,28 @@ Timer transform:17.5998 s
 
  
     '''
-
+    from MyOutils import Timer
+    timer =Timer()
+    X = pd.DataFrame( np.random.randint(0,1000,size=(100000,500)) ,dtype=int)
+    test_arr=pd.DataFrame( np.random.choice(list('abcd'),size=(100000,100),replace=True),dtype=str) 
+    test_X= pd.concat([X,test_arr],axis=1,ignore_index=True)
+    test_X.rename(columns = lambda c:str(c),inplace=True)
+    print(test_X.shape)
+    print(test_X.info(memory_usage='deep') )
+    
+    timer.start('famd')
+    famd=FAMD()
+    famd.fit(test_X)
+    timer.stopprint('famd')
+    
+    timer.start('correlation')
+    famd.column_correlation(test_X)
+    timer.stopprint('correlation')   
+   
+    timer.start('transform')    
+    X_t=famd.transform(test_X)
+    timer.stopprint('transform')    
+    
+    assert X_t.shape[1] == famd.n_components,ValueError("")
         
                           

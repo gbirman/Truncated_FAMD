@@ -5,7 +5,7 @@ Created on Thu Jan 31 11:31:55 2019
 @author: luyao.li
 """
 
-from  fast_PCA import PCA
+from  .fast_PCA import PCA
 import numpy as np
 import pandas as pd
 
@@ -15,7 +15,7 @@ from sklearn.utils import check_array
 from sklearn.utils.validation import check_is_fitted
 from sklearn.utils.extmath import safe_sparse_dot
 
-from outils import  _OneHotEncoder
+from .outils import  _OneHotEncoder,_pearsonr
 
 
 
@@ -53,8 +53,8 @@ class CA(PCA):
             _S=safe_sparse_dot(diags(self.r_ ** -0.5).toarray(),X- np.outer(self.r_,self.c_) )
             S=safe_sparse_dot(_S,diags(self.c_** -0.5).toarray())
         else:
-            _S=np.dot(diags(self.r_ ** -0.5).toarray(),X- np.outer(self.r_,self.c_) )
-            S=safe_sparse_dot(_S ,diags(self.c_** -0.5).toarray()  )
+            S=diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_) ) @ diags(self.c_** -0.5)
+
 
         self= super().fit(S)
         
@@ -70,10 +70,10 @@ class CA(PCA):
         X =X/ np.sum(X,axis=1)[:,None]
         
         if issparse(X):
-            _X=safe_sparse_dot(X,diags(self.c_ ** - 0.5).toarray() )
+            _X=safe_sparse_dot(X,diags(self.c_ ** - 0.5) )
             X_t=safe_sparse_dot(_X,self.components_.T)
         else:
-            X_t= X @ diags(self.c_ ** -0.5).toarray() @ self.components_.T
+            X_t= X @ diags(self.c_ ** -0.5) @ self.components_.T
                     
         return  X_t       
     
@@ -109,45 +109,52 @@ class MCA(CA):
         def transform(self,X,y=None):
             return super().transform( self.one_hot.transform(X))
         
+        
         def column_correlation(self,X,same_input=True):
-            return super().column_correlation(self.one_hot.transform(X))
-        
-
-if __name__=='__main__':
-
-#    Questions:
-#    1) File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 44, in fit
-#        X/=np.sum(X)
-#TypeError: No loop matching the specified signature and casting
-#was found for ufunc true_divide:
-#            X = X/np.sum(X)
-#    2)
-#  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 56, in fit
-#    S= diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_))  @diags(self.c_ ** -0.5)
-#    MemoryError:
-#        _S=np.dot(diags(self.r_ ** -0.5),X- np.outer(self.r_,self.c_) )
-#            S=np.dot(_S,diags(self.c_** -0.5))
-#    3
-#  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 58, in fit
-#    S=np.dot(_S ,diags(self.c_** -0.5) ) <class 'numpy.ndarray'> @ <class 'scipy.sparse.dia.dia_matrix'>
-#  File "C:\Users\admin\Anaconda3\lib\site-packages\scipy\sparse\base.py", line 439, in __mul__
-#    raise ValueError('dimension mismatch')
-#ValueError: dimension mismatch:
-#    scipy.sparse.dia.dia_matrix =dia_matrix.toarray()
-
-
-
-    test_arr=np.random.choice(list('abcd'),size=(10000,400),replace=True)
-    mca=MCA()
-    mca.fit(test_arr)
-    test_arr_t=mca.transform(test_arr)
-    assert test_arr_t.shape[1] ==  mca.n_components,ValueError("")
-        
+            if   same_input: #X is fitted and the the data fitting and the data transforming is the same
+                X_t=self.transform(X)
+            else:
+                X_t=self.fit_transform(X)
+   
+            X_one_hot =self.one_hot.transform(X)
             
-            
-            
+            return pd.DataFrame({index_comp:{ 
+                                col_name: _pearsonr(X_t[:,index_comp],X_one_hot.loc[:,col_name].values.to_dense())
+                                  for col_name in  X_one_hot
+                                        }
+                                        for index_comp  in range(X_t.shape[1])})
+                    
         
-        
-            
-        
-        
+#            df =pd.DataFrame({index_comp:{ 
+#                                col_name: _pearsonr(X_t[:,index_comp],X_one_hot.loc[:,col_name].values)
+#                                  for col_name in  X_one_hot
+#                                        }
+#                                        for index_comp  in range(X_t.shape[1])})
+#    '''
+##    Questions:
+##    1) File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 44, in fit
+##        X/=np.sum(X)
+##TypeError: No loop matching the specified signature and casting
+##was found for ufunc true_divide:
+##            X = X/np.sum(X)
+##    2)
+##  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 56, in fit
+##    S= diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_))  @diags(self.c_ ** -0.5)
+##    MemoryError:
+##        _S=np.dot(diags(self.r_ ** -0.5),X- np.outer(self.r_,self.c_) )
+##            S=np.dot(_S,diags(self.c_** -0.5))
+##    3)
+##  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 58, in fit
+##    S=np.dot(_S ,diags(self.c_** -0.5) ) <class 'numpy.ndarray'> @ <class 'scipy.sparse.dia.dia_matrix'>
+##  File "C:\Users\admin\Anaconda3\lib\site-packages\scipy\sparse\base.py", line 439, in __mul__
+##    raise ValueError('dimension mismatch')
+##ValueError: dimension mismatch:
+##    scipy.sparse.dia.dia_matrix =dia_matrix.toarray()
+#    4) corr_df=mca.column_correlation(test_arr) 
+#                return super().column_correlation(self.one_hot.transform(X))
+#                    X_t=self.transform(X)
+#                        return super().transform( self.one_hot.transform(X)): twice use self.one_hot.transform(X)
+#                        
+#                return  super().column_correlation(X)
+#                        
+#    ''
