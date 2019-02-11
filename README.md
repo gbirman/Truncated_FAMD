@@ -1,13 +1,13 @@
 
 #FAST_FAMD: 
 ##Description:
-Scalable factor anlysis for mixed and sparse data
+- Scalable factor anlysis for mixed and sparse data
 
 
 ##Subclasses:
-###MCA:Multiply Category Aalysis class
-###PCA:Principal Component Analysis class
-###MFA:Multiply Factor Analysis class
+- MCA:Multiply Category Aalysis class
+- PCA:Principal Component Analysis class
+- MFA:Multiply Factor Analysis class
 
 
 
