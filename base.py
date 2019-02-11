@@ -105,7 +105,7 @@ class _BasePCA(BaseEstimator,TransformerMixin):
     def invert_transform(self,X):
         '''
         if whiten: X_raw= X* np.sqrt(explained_variance_) @ components
-    else:  X_raw =X @ components
+        else:  X_raw =X @ components
         '''
         if self.whiten:
             X *=np.sqrt( self.explained_variance_)
