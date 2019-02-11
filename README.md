@@ -1,7 +1,7 @@
 
 # FAST_FAMD #
 ## Description: ##
-- Scalable factor anlysis for mixed and sparse data
+- Scalable Factor Anlysis for Mixed and Sparse Data
 
 
 ## Subclasses: ##
