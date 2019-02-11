@@ -1,17 +1,17 @@
 
-#FAST_FAMD: 
-##Description:
+# FAST_FAMD #
+## Description: ##
 - Scalable factor anlysis for mixed and sparse data
 
 
-##Subclasses:
+## Subclasses: ##
 - MCA:Multiply Category Aalysis class
 - PCA:Principal Component Analysis class
 - MFA:Multiply Factor Analysis class
 
 
 
-##Example:
+## Example: ##
     from fast_FAMD import FAMD
 	famd=FAMD(n_components=2,
 			svd_solver='auto',copy=True,
