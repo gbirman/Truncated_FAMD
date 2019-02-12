@@ -131,7 +131,10 @@ class  PCA(_BasePCA):
         return self
     
     def _fit(self,X,y=None):
-        check_array(X,accept_sparse=['csc','csr'])
+        try:
+            check_array(X,accept_sparse=['csc','csr'])
+        except Exception:
+            raise ValueError('{0}'.format(X[:10000,1]) ,X.shape)
         n_samples,n_features =X.shape
         
         if  n_features >= n_samples:
@@ -430,8 +433,44 @@ class  PCA(_BasePCA):
     
     
     
-
-
+if  __name__== '__main__':
+    '''
+    Questions:
+        1)267: X -= total_mean  TypeError:Cannot cast ufunc subtract output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
+             X =X -total_mean or  np.subtract(X,total_mean,out=X,casting='unsafe') 
+    
+    
+  2)File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 272, in partial_fit
+    mean_correction=sqrt(n_samples*self.n_samples_seen /n_sample_total)*(_local_mean - self.mean_)
+    AttributeError: 'PCA' object has no attribute 'n_samples_seen':
+        n_sample_seen
+    
+   3)turn off  DataConversionWarning:
+       from sklearn.exceptions import DataConversionWarning
+       warnings.filterwarnings(action='ignore', category=DataConversionWarning)
+       
+       with warnings.catch_warnings():
+           warnings.simplefilter("ignore")
+           
+    
+  4) File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 386, in _partial_fit_truncated
+    explained_variance_ratio=  explained_variance/ total_var
+    :explained_variance_ratio=  explained_variance/ total_var.sum()
+        
+    5)E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py:270: RuntimeWarning: overflow encountered in long_scalars
+  mean_correction=sqrt(n_samples*self.n_sample_seen /n_sample_total)*(_local_mean - self.mean_)
+  ValueError: math domain error:
+      np.sqrt
+      
+      6)
+  File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 426, in <dictcomp>
+    for index_col,col_name in enumerate(col_names)
+    ValueError: operands could not be broadcast together with shapes (2,) (10000,) 
+    if  same_input:
+        X_t=self.transform(X)
+    
+    
+    '''
 
         
 

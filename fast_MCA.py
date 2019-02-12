@@ -35,26 +35,24 @@ class CA(PCA):
                          random_state=random_state)
         
     def fit(self, X,y=None):
+
         
         if  isinstance(X,(pd.DataFrame,pd.SparseDataFrame)):
             X=X.values
-            
         if np.any(X<0,axis=None):
             raise ValueError('All values in X must be positive')
-        
 
         X = X/np.sum(X)
         
         #compute row and column masses
         self.r_=  np.sum(X,axis=1)
         self.c_= np.sum(X,axis=0)
-        
+
         if issparse(X):
             _S=safe_sparse_dot(diags(self.r_ ** -0.5).toarray(),X- np.outer(self.r_,self.c_) )
             S=safe_sparse_dot(_S,diags(self.c_** -0.5).toarray())
         else:
             S=diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_) ) @ diags(self.c_** -0.5)
-
 
         self= super().fit(S)
         
@@ -101,11 +99,8 @@ class MCA(CA):
             self.one_hot=_OneHotEncoder().fit(X)
             n_new_cols=len(self.one_hot.column_names_)
             self.total_var = (n_new_cols-n_initial_cols) / n_initial_cols
-            
             return super().fit(self.one_hot.transform(X))
-            
-
-        
+             
         def transform(self,X,y=None):
             return super().transform( self.one_hot.transform(X))
         
@@ -125,4 +120,32 @@ class MCA(CA):
                                         for index_comp  in range(X_t.shape[1])})
                     
         
-
+#'''
+###    Questions:
+###    1) File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 44, in fit
+###        X/=np.sum(X)
+###TypeError: No loop matching the specified signature and casting
+###was found for ufunc true_divide:
+###            X = X/np.sum(X)
+###    2)
+###  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 56, in fit
+###    S= diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_))  @diags(self.c_ ** -0.5)
+###    MemoryError:
+###        _S=np.dot(diags(self.r_ ** -0.5),X- np.outer(self.r_,self.c_) )
+###            S=np.dot(_S,diags(self.c_** -0.5))
+###    3)
+###  File "E:/1113蓝海数据建模/fast_FAMD/fast_MCA.py", line 58, in fit
+###    S=np.dot(_S ,diags(self.c_** -0.5) ) <class 'numpy.ndarray'> @ <class 'scipy.sparse.dia.dia_matrix'>
+###  File "C:\Users\admin\Anaconda3\lib\site-packages\scipy\sparse\base.py", line 439, in __mul__
+###    raise ValueError('dimension mismatch')
+###ValueError: dimension mismatch:
+###    scipy.sparse.dia.dia_matrix =dia_matrix.toarray()
+##    4) corr_df=mca.column_correlation(test_arr) 
+##                return super().column_correlation(self.one_hot.transform(X))
+##                    X_t=self.transform(X)
+##                        return super().transform( self.one_hot.transform(X)): twice use self.one_hot.transform(X)
+##                        
+##                return  super().column_correlation(X)
+##   5)C:\Users\admin\Anaconda3\lib\site-packages\fast_FAMD\fast_MCA.py:55: RuntimeWarning: divide by zero encountered in power
+##  S=diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_) ) @ diags(self.c_** -0.5)                     
+#'''
