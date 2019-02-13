@@ -148,8 +148,8 @@ class  PCA(_BasePCA):
         self.var_ =0.
         self.n_sample_seen=0
         self.components_=None
-        self.explained_variance=None
-        self.explained_variance_ratio=None
+        self.explained_variance_=None
+        self.explained_variance_ratio_=None
         self.singular_values = None
         self.noise_variance = None
         
@@ -257,8 +257,10 @@ class  PCA(_BasePCA):
         
         '''
         '''
-        if issparse(X):
+        if issparse(X) :
             total_mean,total_variance,n_sample_total=incr_mean_variance_axis0(X,self.mean_,self.var_,self.n_sample_seen)
+        
+            
         else:
             total_mean,total_variance,n_sample_total=_incremental_mean_and_var(X,self.mean_,self.var_,self.n_sample_seen)
         
@@ -311,19 +313,19 @@ class  PCA(_BasePCA):
         U,VT=svd_flip(U,VT)
         
         components_= VT
-        explained_variance= S**2/(n_samples -1)
+        explained_variance_= S**2/(n_samples -1)
         if hasattr(self,'total_var'):
             total_var=self.total_var
         else:
-            total_var=  explained_variance.sum()
-        explained_variance_ratio=  explained_variance/ total_var
+            total_var=  explained_variance_.sum()
+        explained_variance_ratio_=  explained_variance_/ total_var
         singular_values=S.copy()
         
         
         if self.n_components =='mle':
             n_components =_infer_dimension_(X,n_samples,n_features)
         elif 0.0 < self.n_components < 1.0:
-            cumsum_explained_var_=stable_cumsum(explained_variance_ratio)
+            cumsum_explained_var_=stable_cumsum(explained_variance_ratio_)
             n_components =np.searchsorted(cumsum_explained_var_,self.n_components)+1
         else:
             n_components=self.n_components
@@ -332,12 +334,12 @@ class  PCA(_BasePCA):
         self.n_components = n_components
         
         self.components_=components_[:self.n_components]
-        self.explained_variance =explained_variance[:self.n_components]
-        self.explained_variance_ratio= explained_variance_ratio[:self.n_components] 
+        self.explained_variance_ =explained_variance_[:self.n_components]
+        self.explained_variance_ratio_= explained_variance_ratio_[:self.n_components] 
         self.singular_values =singular_values[:self.n_components]
         
         if n_components <  min(n_samples,n_features):
-            self.noise_variance =explained_variance[self.n_components:].mean()
+            self.noise_variance =explained_variance_[self.n_components:].mean()
         else:
             self.noise_variance=0.0
         
@@ -380,17 +382,17 @@ class  PCA(_BasePCA):
                                   random_state=random_state)
                    
         self.components_= VT
-        self.explained_variance= S**2/(n_samples -1)
+        self.explained_variance_= S**2/(n_samples -1)
         
         if hasattr(self,'total_var'):
             total_var=self.total_var  #MCA :float
         else:
             total_var=  np.var(X,ddof=1,axis=0).sum()
-        self.explained_variance_ratio=  self.explained_variance/ total_var
+        self.explained_variance_ratio_=  self.explained_variance_/ total_var
         self.singular_values=S.copy()        
         
         if self.n_components <  min(n_samples,n_features):
-            self.noise_variance =(total_var - self.explained_variance.sum())/(min(n_samples,n_features)-self.n_components) 
+            self.noise_variance =(total_var - self.explained_variance_.sum())/(min(n_samples,n_features)-self.n_components) 
         else:
             self.noise_variance=0.
         
@@ -399,6 +401,10 @@ class  PCA(_BasePCA):
     
     def fit_transform(self, X,y=None):
         n_samples,n_features= X.shape
+        
+        if  isinstance(X,(pd.DataFrame,pd.SparseDataFrame)):
+            X=X.values   
+            
         U,S,VT=self._fit(X)
 
         U=U[:,:self.n_components]
@@ -433,44 +439,7 @@ class  PCA(_BasePCA):
     
     
     
-if  __name__== '__main__':
-    '''
-    Questions:
-        1)267: X -= total_mean  TypeError:Cannot cast ufunc subtract output from dtype('float64') to dtype('int32') with casting rule 'same_kind'
-             X =X -total_mean or  np.subtract(X,total_mean,out=X,casting='unsafe') 
-    
-    
-  2)File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 272, in partial_fit
-    mean_correction=sqrt(n_samples*self.n_samples_seen /n_sample_total)*(_local_mean - self.mean_)
-    AttributeError: 'PCA' object has no attribute 'n_samples_seen':
-        n_sample_seen
-    
-   3)turn off  DataConversionWarning:
-       from sklearn.exceptions import DataConversionWarning
-       warnings.filterwarnings(action='ignore', category=DataConversionWarning)
-       
-       with warnings.catch_warnings():
-           warnings.simplefilter("ignore")
-           
-    
-  4) File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 386, in _partial_fit_truncated
-    explained_variance_ratio=  explained_variance/ total_var
-    :explained_variance_ratio=  explained_variance/ total_var.sum()
-        
-    5)E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py:270: RuntimeWarning: overflow encountered in long_scalars
-  mean_correction=sqrt(n_samples*self.n_sample_seen /n_sample_total)*(_local_mean - self.mean_)
-  ValueError: math domain error:
-      np.sqrt
-      
-      6)
-  File "E:/1113蓝海数据建模/fast_FAMD/fast_PCA.py", line 426, in <dictcomp>
-    for index_col,col_name in enumerate(col_names)
-    ValueError: operands could not be broadcast together with shapes (2,) (10000,) 
-    if  same_input:
-        X_t=self.transform(X)
-    
-    
-    '''
+
 
         
 

@@ -108,22 +108,8 @@ class MFA(PCA):
                                     for index_comp  in range(X_t.shape[1])})
         
         
-'''
-Questions：
-1)
-  File "E:\1113蓝海数据建模\fast_FAMD\fast_MFA.py", line 82, in _X_global
-    X_global=pd.concat(X_partial,axis=1)
-    TypeError: first argument must be an iterable of pandas objects,
-    you passed an object of type "SparseDataFrame
-            X_global=pd.concat(X_partial,axis=1) ->  X_global=pd.concat(X_global,axis=1)
-2)
-          if self.partial_factor_analysis_[name].__class__.__name__ =='PCA':
-                X_partial=  self.partial_factor_analysis_[name].scaler_.transform(X_partial) -> np.array
-    
- 将所有X_partial convert to np.ndarray
 
 
-'''
                 
             
                 
