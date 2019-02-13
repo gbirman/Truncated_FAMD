@@ -36,7 +36,7 @@ Under the hood `Truncated_FAMD` uses `partial_fit` method on chunks of data fetc
 In this package,inheritance relationship as shown  below(A->B:A is superclass of B):
 
 - _BasePCA ->PCA ->CA -> MCA 
--                ->MFA -> FAMD
+- _BasePCA ->PCA ->MFA -> FAMD
 
 You are supposed to use each method depending on your situation:
 
@@ -55,7 +55,7 @@ The next subsections give an overview of each method along with usage informatio
 - [Singular Value Decomposition Tutorial](https://davetang.org/file/Singular_Value_Decomposition_Tutorial.pdf)
 - [Multiple Factor Analysis](https://www.utdallas.edu/~herve/Abdi-MFA2007-pretty.pdf)
 
-Notice that `Light_FAMD` does't support the sparse input,see [Truncated_FAMD](https://github.com/Cauchemare/Truncated_FAMD) for an alternative of sparse and big data.
+
 
 
 ###	Principal-Component-Analysis: PCA
