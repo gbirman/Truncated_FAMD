@@ -1,7 +1,7 @@
 
 # Truncated_FAMD
 
-`Truncated_FAMD` is a library for prcessing [factor analysis of mixed data](https://www.wikiwand.com/en/Factor_analysis). This includes a variety of methods including [principal component analysis (PCA)](https://www.wikiwand.com/en/Principal_component_analysis) and [multiply correspondence analysis (MCA)](https://www.researchgate.net/publication/239542271_Multiple_Correspondence_Analysis). The goal is to provide an efficient and truncated implementation for each algorithm along with a scikit-learn API.
+`Truncated_FAMD` is a library for processing [factor analysis of mixed data](https://www.wikiwand.com/en/Factor_analysis). This includes a variety of methods including [principal component analysis (PCA)](https://www.wikiwand.com/en/Principal_component_analysis) and [multiply correspondence analysis (MCA)](https://www.researchgate.net/publication/239542271_Multiple_Correspondence_Analysis). The goal is to provide an efficient and truncated implementation for each algorithm along with a scikit-learn API.
 
 ## Table of contents
 
