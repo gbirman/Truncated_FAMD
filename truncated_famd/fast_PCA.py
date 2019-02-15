@@ -201,7 +201,6 @@ class  PCA(_BasePCA):
 #    standard_scaler:True
 #    whiten:Bool false
 #    copy:Bool  True
-#    除开直接从_init__ 继承过来的attr ,其他必需attr or  None attr 都需要考虑 components_,n_components,svd_solver
 
         '''
         if check_input:
@@ -273,7 +272,7 @@ class  PCA(_BasePCA):
             X =X - _local_mean
             #mean_correction= sqrt( local_samples*merge_before_samples/merge_after_samples )*(merge_before_mean-local_mean )
             mean_correction=np.sqrt( (n_samples*self.n_sample_seen )/n_sample_total)*(self.mean_ - _local_mean )
-            #vstack : singular_values_(K,)*components_(K,N),X(M,N),mean_correction(N,)
+            #vstack : singular_values(K,)*components_(K,N),X(M,N),mean_correction(N,)
             X=np.vstack((self.singular_values[:,None]*self.components_,X,mean_correction))
           
         self.mean_ = total_mean
