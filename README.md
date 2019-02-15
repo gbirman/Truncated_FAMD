@@ -77,7 +77,7 @@ Return ndarray (M,k),M:Number of samples,K:Number of components.
 **Examples:**
 ```
 >>>import numpy as np
->>>from Light_Famd import PCA
+>>>from Truncated_Famd import PCA
 >>>X = pd.DataFrame(np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]]),columns=list('ABC'))
 >>>pca = PCA(n_components=2)
 >>>pca.fit(X)
