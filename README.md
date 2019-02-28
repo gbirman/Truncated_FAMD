@@ -74,10 +74,23 @@ The next subsections give an overview of each method along with usage informatio
 - `random_state`(int, RandomState instance or None, optional (default=None):The seed of the -pseudo random number generator to use when shuffling the data. If int, random_state is the seed used by the random number generator; If RandomState instance, random_state is the random number generator; If None, the random number generator is the RandomState instance used by np.random.
 Return ndarray (M,k),M:Number of samples,K:Number of components.
 
+
+**Fitted Estimator**
+**Attributes:**
+- `components_`(array), shape (n_components, n_features)
+Principal axes in feature space, representing the directions of maximum variance in the data. The components are sorted by explained_variance_.
+- `explained_variance_`(array), shape (n_components,):The amount of variance explained by each of the selected components.
+- `explained_variance_ratio_`(array), shape (n_components,):Percentage of variance explained by each of the selected components.
+- `singular_values`(array),shape (n_components,):The singular values corresponding to each of the selected components. The singular values are equal to the 2-norms of the n_components variables in the lower-dimensional space.
+- `n_components`(int):The estimated number of components. When n_components is set to ‘mle’ or a number between 0 and 1 (with svd_solver == ‘full’) this number is estimated from input data. Otherwise it equals the parameter n_components, or the lesser value of n_features and n_samples if n_components is None.
+- `noise_variance`(float):The estimated noise covariance following the Probabilistic PCA model from Tipping and Bishop 1999. See “Pattern Recognition and Machine Learning” by C. Bishop, 12.2.1 p. 574 or http://www.miketipping.com/papers/met-mppca.pdf. It is required to compute the estimated data covariance and score samples.Equal to the average of (min(n_features, n_samples) - n_components) smallest eigenvalues of the covariance matrix of X.
+
+
+
 **Examples:**
 ```
 >>>import numpy as np
->>>from Light_Famd import PCA
+>>>from Truncated_Famd import PCA
 >>>X = pd.DataFrame(np.array([[-1, -1], [-2, -1], [-3, -2], [1, 1], [2, 1], [3, 2]]),columns=list('ABC'))
 >>>pca = PCA(n_components=2)
 >>>pca.fit(X)
