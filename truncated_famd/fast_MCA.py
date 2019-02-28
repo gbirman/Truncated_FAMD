@@ -54,6 +54,7 @@ class CA(PCA):
         else:
             S=diags(self.r_ ** -0.5) @ (X- np.outer(self.r_,self.c_) ) @ diags(self.c_** -0.5)
 
+
         self= super().fit(S)
         
         return self
@@ -97,9 +98,16 @@ class MCA(CA):
             
             n_initial_cols=X.shape[1]
             self.one_hot=_OneHotEncoder().fit(X)
-            n_new_cols=len(self.one_hot.column_names_)
-            self.total_var = (n_new_cols-n_initial_cols) / n_initial_cols
-            return super().fit(self.one_hot.transform(X))
+
+            _X_t=  self.one_hot.transform(X) 
+            
+            _0_freq_serie= (_X_t == 0).sum(axis=0)/ len(_X_t)
+        
+            self._usecols=_0_freq_serie[_0_freq_serie < 0.99].index
+            print('MCA PROCESS HAVE ELIMINATE {0}  COLUMNS SINCE ITS MISSING RATE >= 99%'.format( _X_t.shape[1] - len(self._usecols) ))            
+            
+            self.total_var = (self._usecols-n_initial_cols) / n_initial_cols
+            return super().fit(_X_t)
              
         def transform(self,X,y=None):
             return super().transform( self.one_hot.transform(X))

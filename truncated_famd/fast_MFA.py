@@ -65,8 +65,10 @@ class MFA(PCA):
                 )
 
             self.partial_factor_analysis_[name] = fa.fit(X.loc[:, cols])  
-            
-        self= super().fit(self._X_global(X))
+        
+        X_global=self._X_global(X)
+        self._usecols= X_global.columns
+        self= super().fit(X_global)
             
         return self
     
@@ -74,13 +76,14 @@ class MFA(PCA):
         for name, cols in  self.groups.items():
             X_globals=[] 
             X_partial= X.loc[:,cols]
-            if self.partial_factor_analysis_[name].__class__.__name__ =='PCA':
-                if hasattr(self.partial_factor_analysis_[name],'scaler_'):
-                    X_partial=  pd.DataFrame(self.partial_factor_analysis_[name].scaler_.transform(X_partial),columns =cols)  
+            _estimator = self.partial_factor_analysis_[name]
+            if _estimator.__class__.__name__ =='PCA':
+                if hasattr(_estimator,'scaler_'):
+                    X_partial=  pd.DataFrame(_estimator.scaler_.transform(X_partial),columns =cols)  
                
             else:
-                X_partial=self.partial_factor_analysis_[name].one_hot.transform(X_partial)
-            X_globals.append(X_partial/ self.partial_factor_analysis_[name].singular_values[0] )
+                X_partial=_estimator.one_hot.transform(X_partial).loc[:,_estimator._usecols].to_dense()
+            X_globals.append(X_partial/ _estimator.singular_values[0] )
                            
         X_global=pd.concat(X_globals,axis=1 )
         return  X_global
@@ -91,6 +94,7 @@ class MFA(PCA):
     
     def fit_transform(self,X,y=None):
         X_global=self._X_global(X)
+        self._usecols= X_global.columns
         return len(X_global) ** 0.5 *super().fit_transform(X_global)        
         
     
