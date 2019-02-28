@@ -106,7 +106,7 @@ class MCA(CA):
             self._usecols=_0_freq_serie[_0_freq_serie < 0.99].index
             print('MCA PROCESS HAVE ELIMINATE {0}  COLUMNS SINCE ITS MISSING RATE >= 99%'.format( _X_t.shape[1] - len(self._usecols) ))            
             
-            self.total_var = (self._usecols-n_initial_cols) / n_initial_cols
+            self.total_var = (len(self._usecols)-n_initial_cols) / n_initial_cols
             return super().fit(_X_t)
              
         def transform(self,X,y=None):
