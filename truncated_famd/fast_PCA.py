@@ -125,7 +125,6 @@ class  PCA(_BasePCA):
         
         if  isinstance(X,(pd.DataFrame,pd.SparseDataFrame)):
             X=X.values
-
             
         self._fit(X)
         return self
@@ -143,7 +142,7 @@ class  PCA(_BasePCA):
         if  self.standard_scaler:
             self.scaler_=StandardScaler(copy=self.copy)
             X= self.scaler_.fit_transform(X)
-            
+
         self.mean_=0.
         self.var_ =0.
         self.n_sample_seen=0

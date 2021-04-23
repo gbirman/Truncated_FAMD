@@ -35,7 +35,8 @@ class MFA(PCA):
         self.partial_factor_analysis_={}
         for name, cols in  self.groups.items():
             all_num = all(pd.api.types.is_numeric_dtype(X[c]) for c in cols)
-            all_cat = all(pd.api.types.is_string_dtype(X[c]) for c in cols)
+            #all_cat = all(pd.api.types.is_string_dtype(X[c]) for c in cols)
+            all_cat = all(pd.api.types.is_categorical_dtype(X[c]) for c in cols)
             if not (all_num or all_cat):
                 raise ValueError('Not all columns in "{}" group are of the same type'.format(name))
         # Run a factor analysis in each group   
@@ -75,7 +76,6 @@ class MFA(PCA):
     def _X_global(self,X) :
         X_globals=[] 
         for name, cols in  self.groups.items():
-
             X_partial= X.loc[:,cols]
             _estimator = self.partial_factor_analysis_[name]
             if _estimator.__class__.__name__ =='PCA':

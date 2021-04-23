@@ -5,7 +5,7 @@ Created on Thu Feb 14 10:20:45 2019
 @author: luyao.li
 """
 from  setuptools import  setup
-with  open('README.md','r') as f:
+with  open('README.md',encoding="utf8") as f:
     LONG_DESCRIPTION=f.read()
 setup(
       name='truncated_famd',
@@ -28,5 +28,3 @@ setup(
               "Topic :: Scientific/Engineering :: Mathematics",
               "Topic :: Software Development :: Libraries :: Python Modules",
               "Intended Audience :: Science/Research"])
-
-
