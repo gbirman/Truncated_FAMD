@@ -35,9 +35,9 @@ class _BasePCA(BaseEstimator,TransformerMixin):
         exp_var = self.explained_variance_
         if self.whiten:
             components_ = components_ * np.sqrt(exp_var[:, np.newaxis])
-        exp_var_diff = np.maximum(exp_var - self.noise_variance_, 0.)
+        exp_var_diff = np.maximum(exp_var - self.noise_variance, 0.)
         cov = np.dot(components_.T * exp_var_diff, components_)
-        cov.flat[::len(cov) + 1] += self.noise_variance_ 
+        cov.flat[::len(cov) + 1] += self.noise_variance 
         return cov
     
     def  get_precision(self):
@@ -53,7 +53,7 @@ class _BasePCA(BaseEstimator,TransformerMixin):
 
         # handle corner cases first
         if self.n_components_ == 0:
-            return np.eye(n_features) / self.noise_variance_
+            return np.eye(n_features) / self.noise_variance
         if self.n_components_ == n_features:
             return linalg.inv(self.get_covariance())
 
@@ -62,13 +62,13 @@ class _BasePCA(BaseEstimator,TransformerMixin):
         exp_var = self.explained_variance_
         if self.whiten:
             components_ = components_ * np.sqrt(exp_var[:, np.newaxis])
-        exp_var_diff = np.maximum(exp_var - self.noise_variance_, 0.)
-        precision = np.dot(components_, components_.T) / self.noise_variance_
+        exp_var_diff = np.maximum(exp_var - self.noise_variance, 0.)
+        precision = np.dot(components_, components_.T) / self.noise_variance
         precision.flat[::len(precision) + 1] += 1. / exp_var_diff
         precision = np.dot(components_.T,
                            np.dot(linalg.inv(precision), components_))
-        precision /= -(self.noise_variance_ ** 2)
-        precision.flat[::len(precision) + 1] += 1. / self.noise_variance_
+        precision /= -(self.noise_variance ** 2)
+        precision.flat[::len(precision) + 1] += 1. / self.noise_variance
         return precision
     
     

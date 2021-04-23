@@ -100,7 +100,7 @@ class MCA(CA):
             self.one_hot=_OneHotEncoder().fit(X)
 
             _X_t=  self.one_hot.transform(X) 
-            
+
             _0_freq_serie= (_X_t == 0).sum(axis=0)/ len(_X_t)
         
             self._usecols=_0_freq_serie[_0_freq_serie < 0.99].index

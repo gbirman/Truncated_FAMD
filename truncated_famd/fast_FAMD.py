@@ -20,15 +20,15 @@ class  FAMD(MFA):
                          iterated_power=iterated_power,
                          batch_size =batch_size,
                          random_state=random_state)   
-    
+
     def fit(self,X,y=None):
         if not isinstance(X,(pd.DataFrame,pd.SparseDataFrame)):
             X=pd.DataFrame(X) 
-        _numric_columns= X.select_dtypes(include=np.number).columns
+        _numeric_columns= X.select_dtypes(include=np.number).columns
         _category_columns=X .select_dtypes(include=['object','category']).columns
-        self.groups= {'Numerical':_numric_columns ,'Categorical':_category_columns }
+        self.groups= {'Numerical':_numeric_columns ,'Categorical':_category_columns }
         
-        return  super().fit(X)
+        return super().fit(X)
     
     def fit_transform(self,X,y=None):
         self.fit(X)
